@@ -1,3 +1,29 @@
+# 🍽️ Khonlathaorai_plush — เว็บแอปหารค่าอาหารง่ายๆ กับเพื่อน  
+
+> แบ่งบิลไม่ใช่เรื่องยากอีกต่อไป 💸  
+> สแกนบิลหรือใส่ยอดเอง แล้ว Khonlathaorai_plush จะช่วยคำนวณให้ว่า “ใครต้องจ่ายเท่าไหร่”
+
+---
+
+## 🚀 Tech Stack
+- **Next.js 16** 
+- **TypeScript** — ปลอดภัยมั่นใจใน type
+- **Tailwind CSS + Intent UI** — สวย เรียบ เท่ ใช้งานง่าย
+
+---
+
+## 🧠 ฟีเจอร์หลัก
+
+✅ เพิ่ม/ลบชื่อเพื่อนในกลุ่ม  
+✅ ใส่ยอดรวมค่าอาหารหรือแตกบิลตามเมนู  
+✅ หารเท่ากัน หรือเลือก “ใครกินอะไร” เพื่อคำนวณแบบละเอียด  
+✅ Download บิลสรุปเป็นรูปภาพ PNG แชร์ให้เพื่อนได้ง่ายๆ
+
+---
+
+
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
@@ -28,9 +54,3 @@ To learn more about Next.js, take a look at the following resources:
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

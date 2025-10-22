@@ -1,65 +1,187 @@
-import Image from "next/image";
+'use client';
 
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { useBillSplitting } from '@/hooks/useBillSplitting';
+import { PersonList } from '@/components/PersonList';
+import { ItemForm } from '@/components/ItemForm';
+import { ItemList } from '@/components/ItemList';
+import { ChargesForm } from '@/components/ChargesForm';
+import { SummaryCard } from '@/components/SummaryCard';
+import { ThemeSwitch } from '@/components/ThemeSwitch';
+import { BillSummaryModal } from '@/components/BillSummaryModal';
+import { Item } from '@/lib/types';
+
+/**
+ * Main page for Bill Splitting App
+ * Requirements: 6.1, 6.2, 6.3, 6.4
+ */
 export default function Home() {
+  const {
+    persons,
+    items,
+    charges,
+    summary,
+    addPerson,
+    removePerson,
+    addItem,
+    updateItem,
+    removeItem,
+    updateCharges
+  } = useBillSplitting();
+
+  const [editingItem, setEditingItem] = useState<Item | null>(null);
+  const [showBillModal, setShowBillModal] = useState(false);
+
+  const handleEditItem = (item: Item) => {
+    setEditingItem(item);
+  };
+
+  const handleViewBillDetail = () => {
+    setShowBillModal(true);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingItem(null);
+  };
+
+  const handleUpdateItem = (id: string, itemData: Partial<Item>) => {
+    const result = updateItem(id, itemData);
+    if (result.success) {
+      setEditingItem(null);
+      toast.success('แก้ไขรายการเรียบร้อย');
+    }
+    return result;
+  };
+
+  const handleAddItem = (itemData: Omit<Item, 'id'>) => {
+    const result = addItem(itemData);
+    if (result.success) {
+      toast.success('เพิ่มรายการเรียบร้อย');
+    }
+    return result;
+  };
+
+  const handleRemoveItem = (id: string) => {
+    removeItem(id);
+    toast.success('ลบรายการเรียบร้อย');
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-background">
+      {/* Skip to main content link for keyboard users */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+      >
+        Skip to main content
+      </a>
+
+      {/* Header */}
+      <header className="border-b sticky top-0 z-50 shadow-sm transition-colors bg-background" role="banner">
+        <div className="container mx-auto px-4 py-4 sm:py-6 sm:px-6 lg:px-8">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">
+                คนละเท่าไหร่ +
+              </h1>
+              <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
+                แบ่งค่าอาหารง่ายๆ กับเพื่อน
+              </p>
+            </div>
+            <ThemeSwitch />
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+      </header>
+
+      {/* Main content */}
+      <main id="main-content" className="container mx-auto px-4 py-4 sm:py-6 lg:py-8 sm:px-6 lg:px-8 max-w-7xl" role="main">
+        {/* Live region for dynamic updates */}
+        <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {persons.length > 0 && `${persons.length} person${persons.length !== 1 ? 's' : ''} added. `}
+          {items.length > 0 && `${items.length} item${items.length !== 1 ? 's' : ''} in the bill.`}
+        </div>
+
+        {/* Mobile & Tablet: Single column layout */}
+        <div className="lg:hidden space-y-4 sm:space-y-6">
+          <PersonList
+            persons={persons}
+            onAddPerson={addPerson}
+            onRemovePerson={removePerson}
+          />
+
+          <ItemForm
+            persons={persons}
+            onAddItem={handleAddItem}
+            onUpdateItem={handleUpdateItem}
+            editingItem={editingItem}
+            onCancelEdit={handleCancelEdit}
+          />
+
+          <ItemList
+            items={items}
+            persons={persons}
+            onEditItem={handleEditItem}
+            onRemoveItem={handleRemoveItem}
+          />
+
+          <ChargesForm
+            charges={charges}
+            onUpdateCharges={updateCharges}
+          />
+
+          <SummaryCard summary={summary} onViewDetail={handleViewBillDetail} />
+        </div>
+
+        {/* Desktop: Multi-column layout */}
+        <div className="hidden lg:grid lg:grid-cols-3 lg:gap-6 xl:gap-8">
+          {/* Left column: Person and Item management */}
+          <div className="lg:col-span-2 space-y-6" role="region" aria-label="Bill management">
+            <PersonList
+              persons={persons}
+              onAddPerson={addPerson}
+              onRemovePerson={removePerson}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+            <ItemForm
+              persons={persons}
+              onAddItem={handleAddItem}
+              onUpdateItem={handleUpdateItem}
+              editingItem={editingItem}
+              onCancelEdit={handleCancelEdit}
+            />
+
+            <ItemList
+              items={items}
+              persons={persons}
+              onEditItem={handleEditItem}
+              onRemoveItem={handleRemoveItem}
+            />
+          </div>
+
+          {/* Right column: Charges and Summary (sticky on desktop) */}
+          <div className="space-y-6" role="region" aria-label="Bill summary">
+            <div className="sticky top-24 space-y-6">
+              <ChargesForm
+                charges={charges}
+                onUpdateCharges={updateCharges}
+              />
+
+              <SummaryCard summary={summary} onViewDetail={handleViewBillDetail} />
+            </div>
+          </div>
         </div>
       </main>
+
+      {/* Bill Summary Modal */}
+      <BillSummaryModal
+        isOpen={showBillModal}
+        onClose={() => setShowBillModal(false)}
+        persons={persons}
+        items={items}
+        charges={charges}
+        summary={summary}
+      />
     </div>
   );
 }
